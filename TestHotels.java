@@ -1,18 +1,31 @@
 package com.sugar.test;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class TestHotels {
 
-	private static final String HOTELS_CONTENTS_START = "<li class=\"hotel\"";
-	private static final String HOTELS_CONTENTS_END = "</li>";
+	private static final String HOTELS_URL = "https://kr.hotels.com";
+	private static final String HOTELS_CONTENTS_START = "<ol";
+	private static final String HOTELS_CONTENTS_END = "</ol>";
+	private static final String HOTELS_STAY_INFO_SEP = "<li class=\"hotel\"";
+	private static final String HOTELS_STAY_NAME_START = "data-title=\"";
+	private static final String HOTELS_STAY_NAME_END = "\"";
+	private static final String HOTELS_IMAGE_URL_START = "background-image:url('";
+	private static final String HOTELS_IMAGE_URL_END = "?impolicy=";
+	private static final String HOTELS_SCORE_START = "<strong class=\"guest-reviews-badge";
+	private static final String HOTELS_SCORE_END = "</strong>";
+	private static final String HOTELS_PRICE_START = "<div class=\"price\">";
+	private static final String HOTELS_PRICE_END = "</strong>";
+	private static final String HOTELS_PRICE_START_INS = "<ins >";
+	private static final String HOTELS_PRICE_END_INS = "</ins>";
+	private static final String HOTELS_LINK_URL_START = "<h3 class=\"p-name\"><a href=\"";
+	private static final String HOTELS_LINK_URL_END = "\"";
 	
 	public static void main(String args[]) throws Exception {
 		
@@ -33,7 +46,7 @@ public class TestHotels {
 	
 		if (list != null) {
 			for (Map<String, Object> map : list) {
-				System.out.println(map.get("imageUrl") + " , " + map.get("score") + " , " + map.get("linkUrl") + " , " + map.get("stayName") + "," + map.get("stayDesc"));
+				System.out.println(map.get("stayName") + " , " + map.get("imageUrl") + " , " + map.get("price") + " , " + map.get("score") + " , " + map.get("linkUrl") + " , " + map.get("stayDesc"));
 			}
 		}
 	}
@@ -45,9 +58,71 @@ public class TestHotels {
 			int sidx = htmlStr.indexOf(HOTELS_CONTENTS_START);
 			int eidx = htmlStr.indexOf(HOTELS_CONTENTS_END, sidx) + HOTELS_CONTENTS_END.length();
 			String contents = htmlStr.substring(sidx, eidx);
-			System.out.println(contents);
+			
+			while (contents.indexOf(HOTELS_STAY_INFO_SEP) != -1) {
+
+				sidx = contents.indexOf(HOTELS_STAY_INFO_SEP);
+				eidx = contents.indexOf(HOTELS_STAY_INFO_SEP, sidx + HOTELS_STAY_INFO_SEP.length());
+
+				if (sidx != -1 && eidx == -1) {
+					eidx = contents.length();
+				}
+				if (sidx == -1 || eidx == -1) {
+					continue;
+				}
+				String item = contents.substring(sidx, eidx);
+				contents = contents.substring(eidx);
+
+				Map<String, Object> itemMap = new HashMap<String, Object>();
+
+				// stayName
+				itemMap.put("stayName", getInnerText(item, HOTELS_STAY_NAME_START, HOTELS_STAY_NAME_END));
+				
+				// imageUtl
+				itemMap.put("imageUrl", getInnerText(item, HOTELS_IMAGE_URL_START, HOTELS_IMAGE_URL_END));
+				
+				// score
+				String score = getInnerText(item, HOTELS_SCORE_START, HOTELS_SCORE_END);
+				if (score.indexOf(">") != -1) {
+					score = score.substring(score.indexOf(">") + 1);
+				}
+				itemMap.put("score", score);
+				
+				// price
+				String price = "";
+				if (item.indexOf(HOTELS_PRICE_START_INS) != -1) {
+					price = getInnerText(item, HOTELS_PRICE_START_INS, HOTELS_PRICE_END_INS);
+				} else {
+					price = getInnerText(item, HOTELS_PRICE_START, HOTELS_PRICE_END);
+					if (price.indexOf("<strong") != -1) {
+						int idx = price.indexOf(">", price.indexOf("<strong")) + 1;
+						price = price.substring(idx);
+					}
+				}
+				itemMap.put("price", price);
+
+				// linkUrl
+				String linkUrl = HOTELS_URL + getInnerText(item, HOTELS_LINK_URL_START, HOTELS_LINK_URL_END);
+				itemMap.put("linkUrl", linkUrl);
+				
+				list.add(itemMap);
+				
+			}
+			
+			
 		}
 		
 		return list;
+	}
+
+	private static String getInnerText(String htmlStr, String startText, String endText) {
+		String retStr = "";
+		
+		int sidx = htmlStr.indexOf(startText) + startText.length();
+		int eidx = htmlStr.indexOf(endText, sidx + 1);
+		if (sidx != -1 && eidx != -1) {
+			retStr = htmlStr.substring(sidx, eidx);
+		}
+		return retStr;
 	}
 }
