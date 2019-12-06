@@ -26,6 +26,12 @@ public class TestHotels {
 	private static final String HOTELS_PRICE_END_INS = "</ins>";
 	private static final String HOTELS_LINK_URL_START = "<h3 class=\"p-name\"><a href=\"";
 	private static final String HOTELS_LINK_URL_END = "\"";
+	private static final String HOTELS_STAY_DESC_START_1 = "<ul class=\"property-landmarks\">";
+	private static final String HOTELS_STAY_DESC_END_1 = "</ul>";
+	private static final String HOTELS_STAY_DESC_START_2 = "parkingOptions\">";
+	private static final String HOTELS_STAY_DESC_END_2 = "</li>";
+	private static final String HOTELS_STAY_DESC_START_3 = "aircondition\">";
+	private static final String HOTELS_STAY_DESC_END_3 = "</li>";
 	
 	public static void main(String args[]) throws Exception {
 		
@@ -105,6 +111,17 @@ public class TestHotels {
 				String linkUrl = HOTELS_URL + getInnerText(item, HOTELS_LINK_URL_START, HOTELS_LINK_URL_END);
 				itemMap.put("linkUrl", linkUrl);
 				
+				// stayDesc
+				String stayDesc = getInnerText(item, HOTELS_STAY_DESC_START_1, HOTELS_STAY_DESC_END_1);
+				stayDesc = stayDesc.replaceAll("</li><li>", ", ");
+				stayDesc = stayDesc.replaceAll("<li>", "");
+				stayDesc = stayDesc.replaceAll("</li>", "");
+				String parking = getInnerText(item, HOTELS_STAY_DESC_START_2, HOTELS_STAY_DESC_END_2);
+				stayDesc = ("".contentEquals(parking)) ? stayDesc:(stayDesc + " / " + parking);
+				String aircondition = getInnerText(item, HOTELS_STAY_DESC_START_3, HOTELS_STAY_DESC_END_3);
+				stayDesc = ("".contentEquals(aircondition)) ? stayDesc:(stayDesc + " / " + aircondition);
+				itemMap.put("stayDesc", stayDesc);
+
 				list.add(itemMap);
 				
 			}
