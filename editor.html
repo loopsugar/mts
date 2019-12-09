@@ -13,6 +13,7 @@
         .board {
             width:80vw;
             height:80vh;
+            min-height:80vh;
             border:1px solid #aaa;
             box-shadow:5px 5px 5px;
         }
@@ -35,6 +36,7 @@
             $("#boardFrame")[0].contentDocument.designMode = "on";
             //$(this).css("height", $("#boardFrame")[0].contentDocument.body.scrollHeight);
             $($("#boardFrame")[0].contentDocument.body).bind("keyup", function(){
+                $("#" + __boardDivId).css("height", __deafultHeight);
                 $("#" + __boardDivId).css("height", $("#boardFrame")[0].contentDocument.body.scrollHeight);
             });
         }
@@ -55,6 +57,7 @@
                 $("#boardFrame", $(this)).show();               
                 $("#boardTextarea", $(this)).hide();               
                 $($("#boardFrame")[0].contentDocument.body).html($("#boardTextarea").val());
+                $("#" + __boardDivId).css("height", __deafultHeight);
                 $("#" + __boardDivId).css("height", $("#boardFrame")[0].contentDocument.body.scrollHeight);
                 __boardMode = "edit";
             }           
