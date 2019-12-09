@@ -21,46 +21,58 @@
     <script>
     
         var __boardMode = "edit" 
-    
+        var __boardDivId = "";
+        var __deafultHeight = "200px";
+        
         $.fn.setBoard = function(){
+            __boardDivId = $(this).attr("id");
+            __defaultHeight = $(this).css("height");
+            
             var iframeHtml = "<iframe id=\"boardFrame\" style=\"width:100%; height:100%; border:none;\"></iframe>";
             var textareaHtml = "<textarea id=\"boardTextarea\" style=\"width:100%; height:100%; border:none; display:none;\"></textarea>";
             $(this).html(iframeHtml);
             $(this).append(textareaHtml);
-            $("#boardFrame")[0].contentDocument.designMode = "on";   
+            $("#boardFrame")[0].contentDocument.designMode = "on";
+            //$(this).css("height", $("#boardFrame")[0].contentDocument.body.scrollHeight);
+            $($("#boardFrame")[0].contentDocument.body).bind("keyup", function(){
+                $("#" + __boardDivId).css("height", $("#boardFrame")[0].contentDocument.body.scrollHeight);
+            });
         }
     
         $.fn.getBoardContents = function(){
-        	var contents = (__boardMode == "edit") ? $($("#boardFrame")[0].contentDocument.body).html():$("#boardTextarea").val();
-        	return contents;
+            var contents = (__boardMode == "edit") ? $($("#boardFrame")[0].contentDocument.body).html():$("#boardTextarea").val();
+            return contents;
         }
 
         $.fn.changeBoardMode = function(){
             if (__boardMode == "edit"){
-                $("#boardFrame", $(this)).hide();            	
+                $("#boardFrame", $(this)).hide();               
                 $("#boardTextarea", $(this)).show();
                 $("#boardTextarea").val($($("#boardFrame")[0].contentDocument.body).html());
+                $("#" + __boardDivId).css("height", __defaultHeight);
                 __boardMode = "src";
             } else {
                 $("#boardFrame", $(this)).show();               
                 $("#boardTextarea", $(this)).hide();               
                 $($("#boardFrame")[0].contentDocument.body).html($("#boardTextarea").val());
+                $("#" + __boardDivId).css("height", $("#boardFrame")[0].contentDocument.body.scrollHeight);
                 __boardMode = "edit";
-            }        	
+            }           
         }
+        
         //-----------------------------------------------------------------------------------
         function showContents(){
-        	alert($("board").getBoardContents());
+            alert($("board").getBoardContents());
         }
         function changeBoardMode(obj){
-        	$("#board").changeBoardMode();
-        	if ($(obj).text() == "소스편집모드"){
-        		$(obj).text("에디터모드");
-        	} else {
+            $("#board").changeBoardMode();
+            if ($(obj).text() == "소스편집모드"){
+                $(obj).text("에디터모드");
+            } else {
                 $(obj).text("소스편집모드");
-        	}
+            }
         }
-	    $(document).ready(function(){
+        $(document).ready(function(){
             $("#board").setBoard();
         });
     </script>
