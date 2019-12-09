@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <title>File Upload</title>
+    <link rel="icon" type="image/png">
+    <style>
+        a:link { text-decoration: none; }
+        a:visited { text-decoration: none; } 
+        
+    </style>
+    <script type="text/javascript" src="/js/lib/jquery-2.2.4.js"></script>
+    <script>
+    
+        function uploadFile(obj){
+            obj.val("");
+            obj.click();
+        }
+        
+        function doUploadFile(obj, callbackFunc){
+
+            var retFiles = [];
+            var readCnt = 0;
+            
+            $.each(obj.files, function(idx, valObj){
+                
+                var reader = new FileReader();
+                reader.onload = function(e){
+                    var fileObj = {};
+                    fileObj.name = valObj.name;
+                    fileObj.size = valObj.size;
+                    fileObj.type = valObj.type;
+                    fileObj.data = e.target.result;
+                    retFiles.push(fileObj);
+                    
+                    readCnt++;
+                    if (readCnt == obj.files.length){
+                        callbackFunc(retFiles);
+                    }
+                }
+                reader.readAsDataURL(valObj);
+            });
+            
+        }
+        
+        function callbackFunc(fileDataList){
+        
+            var fileInfoHtml = "";
+            
+            $.each(fileDataList, function(idx, valObj){
+                fileInfoHtml += "* Name : " + valObj.name + "<br>";
+                fileInfoHtml += "* Size : " + valObj.size + "<br>";
+                fileInfoHtml += "* Type : " + valObj.type + "<br>";
+                fileInfoHtml += "<img src=\"" + valObj.data + "\" style=\"width:200px; height:150px;\">";
+                fileInfoHtml += "<hr style='width:100%; border:1px solid #000;'>";
+            });
+            
+            $("#fileInfo").html(fileInfoHtml);
+        }
+        
+        $(document).ready(function(){
+
+        });
+	    
+    </script>
+</head>
+<body>
+    
+<a href="javascript:;" onClick="javascript:uploadFile($('#files'));">파일올리기</a>
+<input type="file" id="files" onChange="javascript:doUploadFile(this, callbackFunc);" multiple style="display:none;">
+<br><br>[FILE INFO]
+<hr style='width:100%; border:1px solid #000;'>
+<div id="fileInfo"></div>
+</body>
+</html>
