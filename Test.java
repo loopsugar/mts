@@ -38,10 +38,12 @@ public class Test {
 			if (isImageUrl(imageUrl)) {
 				startIndex = htmlStr.indexOf(GOOGLE_IMAGE_START2, endIndex) + 3;
 				endIndex = htmlStr.indexOf(GOOGLE_IMAGE_END, startIndex);
-				String linkUrl = htmlStr.substring(startIndex, endIndex);
-				htmlStr = htmlStr.substring(endIndex);
+				if (startIndex >= 3 && endIndex >= 0) {
+					String linkUrl = htmlStr.substring(startIndex, endIndex);
+					htmlStr = htmlStr.substring(endIndex);
 
-				System.out.println(">> " + startIndex + "," + endIndex + " >> " + imageUrl + " , " + linkUrl);
+					System.out.println(">> " + startIndex + "," + endIndex + " >> " + imageUrl + " , " + linkUrl);
+				}
 			}
 		}
 		
